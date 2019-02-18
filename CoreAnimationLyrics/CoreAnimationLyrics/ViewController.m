@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#define TextLayerHeight 30
+
 @interface ViewController ()
 @property UIView *lyricsView;
 @property NSInteger current;
@@ -28,7 +30,9 @@
     
     [self setupLyricsView];
     
-    [self addLyricsTextLayer:lyrics];    
+    [self addLyricsTextLayer:lyrics];
+    
+    [self setupPlayButton];
 }
 
 - (NSArray*)parseFile:(NSString*)file type:(NSString*)type
@@ -69,7 +73,7 @@
     for (int i = 0; i < lyrics.count; i++) {
         
         CATextLayer *textLayer = [CATextLayer new];
-        textLayer.frame = CGRectMake(0, i * 30, [[UIScreen mainScreen] bounds].size.width, 30);
+        textLayer.frame = CGRectMake(0, i * TextLayerHeight, [[UIScreen mainScreen] bounds].size.width, TextLayerHeight);
         
         [textLayer setFont:@"Helvetica"];
         [textLayer setFontSize:20];
@@ -80,8 +84,6 @@
 
         [self.lyricsView.layer addSublayer:textLayer];
     }
-    
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTimer:) userInfo:nil repeats:YES];
 }
 
 - (void)updateLayers
@@ -110,7 +112,7 @@
 - (void)moveUpTextLayer:(CATextLayer*)textlayer
 {
     CGPoint originPosition = CGPointMake(textlayer.position.x, textlayer.position.y);
-    CGPoint newPosition = CGPointMake(originPosition.x, originPosition.y - 30);
+    CGPoint newPosition = CGPointMake(originPosition.x, originPosition.y - TextLayerHeight);
 
     CABasicAnimation *moveUp = [CABasicAnimation animationWithKeyPath:@"position"];
     moveUp.fromValue = [NSValue valueWithCGPoint:originPosition];
@@ -133,6 +135,59 @@
         
         self.timer = nil;
     }
+}
+
+- (void)setupPlayButton
+{
+    UIButton *button = [UIButton new];
+    
+    [button setTitle:@"PLAY" forState:UIControlStateNormal];
+    [button setBackgroundColor:[UIColor blackColor]];
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [button setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+    button.layer.cornerRadius = 20;
+    
+    [button addTarget:self action:@selector(playButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    button.translatesAutoresizingMaskIntoConstraints=NO;
+    
+    [self.view addSubview:button];
+    
+    NSMutableArray *constraints = [NSMutableArray array];
+    
+    [constraints addObjectsFromArray:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(100)-[button]-(100)-|"
+                                             options:NSLayoutFormatAlignAllCenterY
+                                             metrics:nil
+                                               views:NSDictionaryOfVariableBindings(button)]];
+    
+    
+    [constraints addObjectsFromArray:
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[button(50)]-(100)-|"
+                                             options:NSLayoutFormatAlignAllCenterX
+                                             metrics:nil
+                                               views:NSDictionaryOfVariableBindings(button)]];
+    
+    [self.view addConstraints:constraints];
+}
+
+- (void)playButtonClick:(UIButton*)sender
+{
+    NSString *title = sender.titleLabel.text;
+    
+    if ([title isEqualToString:@"PLAY"]) {
+        
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTimer:) userInfo:nil repeats:YES];
+    
+    } else {
+        
+        [self.timer invalidate];
+        
+        self.timer = nil;
+    }
+    
+    NSString *newTitle = [title isEqual:@"PLAY"]? @"PAUSE" : @"PLAY";
+    [sender setTitle:newTitle forState:UIControlStateNormal];
 }
 
 @end
