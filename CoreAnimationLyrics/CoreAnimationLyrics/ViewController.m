@@ -7,13 +7,17 @@
 //
 
 #import "ViewController.h"
+#import "LyricsView.h"
 
-#define TextLayerHeight 30
+#define PlayButtonTitle @"PLAY"
+#define PauseButtonTitle @"PAUSE"
 
 @interface ViewController ()
-@property UIView *lyricsView;
-@property NSInteger current;
+@property LyricsView *lyricsView;
+@property NSInteger currentLine;
 @property NSTimer *timer;
+@property UIButton *playButton;
+@property NSArray<NSString*> *lyrics;
 @end
 
 @implementation ViewController
@@ -22,17 +26,22 @@
 {
     [super viewDidLoad];
     
-    self.current = 0;
+    self.currentLine = 0;
     
     [self.view setBackgroundColor:[UIColor darkGrayColor]];
     
-    NSArray *lyrics = [self parseFile:@"Lyrics" type:@"txt"];
-    
     [self setupLyricsView];
     
-    [self addLyricsTextLayer:lyrics];
-    
+    [self setLyrics];
+
     [self setupPlayButton];
+}
+
+- (void)setLyrics
+{
+    self.lyrics = [self parseFile:@"Lyrics" type:@"txt"];
+    
+    [self.lyricsView addLyricsTextLayer:self.lyrics];
 }
 
 - (NSArray*)parseFile:(NSString*)file type:(NSString*)type
@@ -48,98 +57,68 @@
 
 - (void)setupLyricsView
 {
-    self.lyricsView = [UIView new];
+    self.lyricsView = [LyricsView new];
     self.lyricsView.translatesAutoresizingMaskIntoConstraints = NO;
     self.lyricsView.clipsToBounds = YES;
     self.lyricsView.backgroundColor = [UIColor darkGrayColor];
     
     [self.view addSubview:self.lyricsView];
     
-    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:self.lyricsView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:[[UIScreen mainScreen] bounds].size.width];
-    [self.view addConstraint:widthConstraint];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.lyricsView
+                                                          attribute:NSLayoutAttributeLeading
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeading
+                                                         multiplier:1.0
+                                                           constant:0]];
     
-    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:self.lyricsView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:500];
-    [self.view addConstraint:heightConstraint];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.lyricsView
+                                                          attribute:NSLayoutAttributeTrailing
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeTrailing
+                                                         multiplier:1.0
+                                                           constant:0]];
     
-    NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintWithItem:self.lyricsView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
-    [self.view addConstraint:verticalConstraint];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.lyricsView
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:150]];
     
-    NSLayoutConstraint *horizontalConstraint = [NSLayoutConstraint constraintWithItem:self.lyricsView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0];
-    [self.view addConstraint:horizontalConstraint];
-}
-
-- (void)addLyricsTextLayer:(NSArray*)lyrics
-{
-    for (int i = 0; i < lyrics.count; i++) {
-        
-        CATextLayer *textLayer = [CATextLayer new];
-        textLayer.frame = CGRectMake(0, i * TextLayerHeight, [[UIScreen mainScreen] bounds].size.width, TextLayerHeight);
-        
-        [textLayer setFont:@"Helvetica"];
-        [textLayer setFontSize:20];
-        [textLayer setString:lyrics[i]];
-        [textLayer setAlignmentMode:kCAAlignmentCenter];
-        [textLayer setForegroundColor:[[UIColor whiteColor] CGColor]];
-        [textLayer setBackgroundColor:[[UIColor darkGrayColor] CGColor]];
-
-        [self.lyricsView.layer addSublayer:textLayer];
-    }
-}
-
-- (void)updateLayers
-{
-    NSArray<CATextLayer *> *textLayers = self.lyricsView.layer.sublayers;
-    
-    for (int i = 0; i < textLayers.count; i++) {
-        
-        if (i == self.current) {
-
-            [textLayers[i] setForegroundColor:[[UIColor blackColor] CGColor]];
-            [textLayers[i] setBackgroundColor:[[UIColor lightGrayColor] CGColor]];
-            
-            if (i != 0) {
-                [textLayers[i-1] setForegroundColor:[[UIColor whiteColor] CGColor]];
-                [textLayers[i-1] setBackgroundColor:[[UIColor darkGrayColor] CGColor]];
-            }
-        }
-        
-        if (self.current >= 9) {
-            [self moveUpTextLayer:textLayers[i]];
-        }
-    }
-}
-
-- (void)moveUpTextLayer:(CATextLayer*)textlayer
-{
-    CGPoint originPosition = CGPointMake(textlayer.position.x, textlayer.position.y);
-    CGPoint newPosition = CGPointMake(originPosition.x, originPosition.y - TextLayerHeight);
-
-    CABasicAnimation *moveUp = [CABasicAnimation animationWithKeyPath:@"position"];
-    moveUp.fromValue = [NSValue valueWithCGPoint:originPosition];
-    moveUp.toValue = [NSValue valueWithCGPoint:newPosition];
-    moveUp.duration   = 1.0;
-    [textlayer addAnimation:moveUp forKey:moveUp.keyPath];
-    
-    textlayer.position = newPosition;
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.lyricsView
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:-150]];
 }
 
 - (void)updateTimer:(NSTimer *)timer
 {
-    [self updateLayers];
-    
-    self.current++;
-    
-    if (self.current == self.lyricsView.layer.sublayers.count) {
+    if (self.currentLine >= self.lyrics.count) {
         
         [self.timer invalidate];
         
         self.timer = nil;
+        
+        [self.playButton setTitle:PlayButtonTitle forState:UIControlStateNormal];
+    
+    } else {
+        
+        [self.lyricsView updateLayersWithHighlightLine:self.currentLine];
+        
+        self.currentLine += 1;
     }
 }
 
 - (void)setupPlayButton
 {
     UIButton *button = [UIButton new];
+    self.playButton = button;
     
     [button setTitle:@"PLAY" forState:UIControlStateNormal];
     [button setBackgroundColor:[UIColor blackColor]];
@@ -163,7 +142,7 @@
     
     
     [constraints addObjectsFromArray:
-     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[button(50)]-(100)-|"
+     [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[button(50)]-(70)-|"
                                              options:NSLayoutFormatAlignAllCenterX
                                              metrics:nil
                                                views:NSDictionaryOfVariableBindings(button)]];
@@ -175,9 +154,16 @@
 {
     NSString *title = sender.titleLabel.text;
     
-    if ([title isEqualToString:@"PLAY"]) {
+    if ([title isEqualToString:PlayButtonTitle]) {
+
+        if (self.currentLine >= self.lyrics.count) {
+            
+            self.currentLine = 0;
+            
+            [self setLyrics];
+        }
         
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateTimer:) userInfo:nil repeats:YES];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updateTimer:) userInfo:nil repeats:YES];
     
     } else {
         
@@ -186,7 +172,7 @@
         self.timer = nil;
     }
     
-    NSString *newTitle = [title isEqual:@"PLAY"]? @"PAUSE" : @"PLAY";
+    NSString *newTitle = [title isEqual:PlayButtonTitle]? PauseButtonTitle : PlayButtonTitle;
     [sender setTitle:newTitle forState:UIControlStateNormal];
 }
 
