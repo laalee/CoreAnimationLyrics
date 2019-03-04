@@ -16,6 +16,7 @@
 		E6BB28FF2216B0940060DE61 /* CoreAnimationLyricsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB28FE2216B0940060DE61 /* CoreAnimationLyricsTests.m */; };
 		E6BB290D2216B6320060DE61 /* Lyrics.txt in Resources */ = {isa = PBXBuildFile; fileRef = E6BB290C2216B6320060DE61 /* Lyrics.txt */; };
 		E6BB2910221AA8110060DE61 /* LyricsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E6BB290F221AA8110060DE61 /* LyricsView.m */; };
+		E6EB3C96222D0E24006197AB /* LyricsTextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = E6EB3C95222D0E24006197AB /* LyricsTextLayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,8 @@
 		E6BB290C2216B6320060DE61 /* Lyrics.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Lyrics.txt; sourceTree = "<group>"; };
 		E6BB290E221AA8110060DE61 /* LyricsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LyricsView.h; sourceTree = "<group>"; };
 		E6BB290F221AA8110060DE61 /* LyricsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LyricsView.m; sourceTree = "<group>"; };
+		E6EB3C94222D0E24006197AB /* LyricsTextLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LyricsTextLayer.h; sourceTree = "<group>"; };
+		E6EB3C95222D0E24006197AB /* LyricsTextLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LyricsTextLayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +101,8 @@
 				E6BB290C2216B6320060DE61 /* Lyrics.txt */,
 				E6BB290E221AA8110060DE61 /* LyricsView.h */,
 				E6BB290F221AA8110060DE61 /* LyricsView.m */,
+				E6EB3C94222D0E24006197AB /* LyricsTextLayer.h */,
+				E6EB3C95222D0E24006197AB /* LyricsTextLayer.m */,
 			);
 			path = CoreAnimationLyrics;
 			sourceTree = "<group>";
@@ -216,6 +221,7 @@
 				E6BB28EA2216B0930060DE61 /* ViewController.m in Sources */,
 				E6BB28F52216B0940060DE61 /* main.m in Sources */,
 				E6BB28E72216B0930060DE61 /* AppDelegate.m in Sources */,
+				E6EB3C96222D0E24006197AB /* LyricsTextLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

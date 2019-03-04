@@ -26,7 +26,7 @@
 {
     [super viewDidLoad];
     
-    self.currentLine = 0;
+    self.currentLine = firstLine;
     
     [self.view setBackgroundColor:[UIColor darkGrayColor]];
     
@@ -112,6 +112,10 @@
         [self.lyricsView updateLayersWithHighlightLine:self.currentLine];
         
         self.currentLine += 1;
+        
+        if ([self.lyrics[self.currentLine] isEqualToString:@""]) {
+            self.currentLine += 1;
+        }
     }
 }
 
@@ -158,12 +162,12 @@
 
         if (self.currentLine >= self.lyrics.count) {
             
-            self.currentLine = 0;
+            self.currentLine = firstLine;
             
             [self setLyrics];
         }
         
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updateTimer:) userInfo:nil repeats:YES];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:2.2 target:self selector:@selector(updateTimer:) userInfo:nil repeats:YES];
     
     } else {
         

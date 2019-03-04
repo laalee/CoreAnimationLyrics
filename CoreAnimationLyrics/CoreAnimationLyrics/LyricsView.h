@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 
 #define TextLayerHeight 30
+#define firstLine 6
 
 NS_ASSUME_NONNULL_BEGIN
 

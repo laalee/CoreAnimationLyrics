@@ -7,6 +7,13 @@
 //
 
 #import "LyricsView.h"
+#import "LyricsTextLayer.h"
+
+@interface LyricsView ()
+{
+    NSMutableArray *layerArray;
+}
+@end
 
 @implementation LyricsView
 
@@ -14,9 +21,11 @@
 {
     self.layer.sublayers = nil;
     
+    layerArray = [[NSMutableArray alloc] init];
+    
     for (int i = 0; i < lyrics.count; i++) {
         
-        CATextLayer *textLayer = [CATextLayer new];
+        LyricsTextLayer *textLayer = [LyricsTextLayer new];
         textLayer.frame = CGRectMake(0, i * TextLayerHeight, [[UIScreen mainScreen] bounds].size.width, TextLayerHeight);
         
         [textLayer setFont:@"Helvetica"];
@@ -27,7 +36,22 @@
         [textLayer setBackgroundColor:[[UIColor darkGrayColor] CGColor]];
         
         [self.layer addSublayer:textLayer];
+        
+        if (i < firstLine) {
+            continue;
+        }
+        
+        UIAccessibilityElement *element = [[UIAccessibilityElement alloc]
+                                             initWithAccessibilityContainer:self];
+        element.accessibilityLabel = lyrics[i];
+        element.accessibilityIdentifier = [NSString stringWithFormat:@"Lyrics %lu", (unsigned long)index];
+        element.accessibilityTraits = UIAccessibilityTraitNone;
+        textLayer.accessibilityElement = element;
+
+        [layerArray addObject:textLayer];
     }
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+
 }
 
 - (NSInteger)centerLine
@@ -69,6 +93,38 @@
     [textlayer addAnimation:moveUp forKey:moveUp.keyPath];
     
     textlayer.position = newPosition;
+}
+
+#pragma mark - accessibility
+
+- (BOOL)isAccessibilityElement
+{
+    return NO;
+}
+
+- (NSInteger)accessibilityElementCount
+{
+    return [layerArray count];
+}
+
+- (id)accessibilityElementAtIndex:(NSInteger)index
+{
+    LyricsTextLayer *aLayer = layerArray[index];
+    CGRect frame = aLayer.frame;
+    aLayer.accessibilityElement.accessibilityFrame = [[UIApplication sharedApplication].keyWindow convertRect:frame fromView:self];
+    return aLayer.accessibilityElement;
+}
+
+- (NSInteger)indexOfAccessibilityElement:(id)element
+{
+    NSInteger index = 0;
+    for (LyricsTextLayer *aLayer in layerArray) {
+        if ([aLayer.accessibilityElement isEqual:element]) {
+            return index;
+        }
+        index++;
+    }
+    return NSNotFound;
 }
 
 @end
